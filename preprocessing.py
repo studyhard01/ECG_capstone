@@ -138,7 +138,7 @@ def run(paths, output_dir = '', ref_path = ''):
     else :
         ref = pd.read_csv(ref_path, names = ['filepath', 'class'])
     
-    index_path = output_dir + 'index.csv'
+    index_path = os.path.join(output_dir , 'index.csv')
     cfg['index_dir'] = output_dir
     cfg['ecg_dir'] = paths
     
@@ -195,12 +195,12 @@ def run(paths, output_dir = '', ref_path = ''):
                     break
 
             else :
-                
                 index_df.loc[num_saved] = [f"{record_rel_path}_{idx}.pkl",
                         f"{record_name}_{idx}.pkl",
                         fs,
                         source_name,
                         ref[ref['filepath'] == f"{record_rel_path}"].iloc[0, 1]]
+                num_saved += 1
 
     print(f"Saved {num_saved} cropped signals, {num_deleted} signals deleted.")
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
@@ -239,11 +239,11 @@ def main() :
     train, valid = train_test_split(index, test_size=0.3, random_state=7, shuffle=True, stratify = index.CLASS)
     test, valid = train_test_split(valid, test_size=0.33, random_state=7, shuffle=True, stratify = valid.CLASS)
     
-    train.to_csv(args.output_dir + 'train.csv', index=False)
-    valid.to_csv(args.output_dir + 'valid.csv', index=False)
-    test.to_csv(args.output_dir + 'test.csv', index=False)
+    train.to_csv(os.path.join(args.output_dir, 'train.csv'), index=False)
+    valid.to_csv(os.path.join(args.output_dir , 'valid.csv'), index=False)
+    test.to_csv(os.path.join(args.output_dir , 'test.csv'), index=False)
     
-    file_path = args.output_dir  + 'cfg.json' 
+    file_path = os.path.join(args.output_dir , 'cfg.json')
 
     cfg['ecg_dir'] = args.output_dir
     
