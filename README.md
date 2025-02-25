@@ -9,6 +9,8 @@ CPSC2018(https://physionet.org/content/challenge-2020/1.0.2/sources/)
 
 Physionet2017(https://physionet.org/content/challenge-2017/1.0.0/)  
 
+PTB-XL(https://physionet.org/content/ptb-xl/1.0.3/)
+
 
 # 실행방법
 
@@ -22,7 +24,7 @@ Physionet2017(https://physionet.org/content/challenge-2017/1.0.0/)
 
 --ref_path : reference 파일의 위치 (처리하는 dataset에 맞춰서 설정)  
 
---dataset : 전처리할 파일의 dataset 이름 (현재 버전은 physionet2017, CPSC2018만 가능)  
+--dataset : 전처리할 파일의 dataset 이름 (현재 버전은 physionet2017, CPSC2018, PTB-XL만 가능)  
 
 
 # dataloader 불러오기
