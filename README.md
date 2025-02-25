@@ -1,6 +1,6 @@
 # ECG_capstone
 
-해당 레포지토리는 ECG Dataset (Physionet2017, CPSC2018)을 가져오기 위해 만들어졌습니다.  
+해당 레포지토리는 ECG Dataset (Physionet2017, CPSC2018, PTB-XL)을 가져오기 위해 만들어졌습니다.  
 ST-MEM 실험을 위해 만들어져 해당 코드를 참고하여 제작하였습니다.  
 
 # 필요사항  
