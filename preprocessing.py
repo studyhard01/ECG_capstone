@@ -113,7 +113,7 @@ def find_records(root_dir):
     for root, _, files in os.walk(root_dir):
         for file in files:
             extension = os.path.splitext(file)[1]
-            if extension == '.hea':
+            if extension == '.hea' and file[-9:-4] != 'point' :
                 record = os.path.relpath(os.path.join(root, file), root_dir)[:-4]
                 records.add(record)
     records = sorted(records)
@@ -132,9 +132,14 @@ def find_records_cpsc(root_dir):
     return records[1:]
 
 def run(paths, output_dir = '', ref_path = ''):
+    args = parser.parse_args()
     
     if cfg['dataset'] == 'CPSC2018' :
         ref = pd.read_csv(ref_path)
+    elif cfg['dataset'] == 'PTB-XL' :
+        ref = pd.read_csv(ref_path, names = ['ecg_id', 'patient_id', 'strat_fold', 'filename_lr', 'filepath',
+       'super_class', 'HYP', 'NORM', 'MI', 'CD', 'STTC'])
+        cla = {'NORM' : 0, 'MI' : 1, 'STTC' : 2, 'CD' : 3, 'HYP' : 4}
     else :
         ref = pd.read_csv(ref_path, names = ['filepath', 'class'])
     
@@ -147,6 +152,7 @@ def run(paths, output_dir = '', ref_path = ''):
         record_rel_paths = find_records_cpsc(paths)
     else :
         record_rel_paths = find_records(paths)
+        
     print(f"Found {len(record_rel_paths)} records.")
 
     # Prepare an index dataframe
@@ -155,7 +161,7 @@ def run(paths, output_dir = '', ref_path = ''):
     # Save all the cropped signals
     num_saved = 0
     num_deleted = 0
-
+    print(ref.columns)
     for record_rel_path in tqdm(record_rel_paths) :
         record_rel_dir, record_name = os.path.split(record_rel_path)
         save_dir = os.path.join(output_dir, record_rel_dir)
@@ -181,6 +187,7 @@ def run(paths, output_dir = '', ref_path = ''):
             #print(ref[ref['Recording'] == f"{'A' + record_rel_path[6:]}"].)
             
             if cfg['dataset'] == 'CPSC2018' :
+                
                 try : 
                     if math.isnan(ref[ref['Recording'] == f"{record_rel_path[3:]}"].iloc[0, 2]) :
                         index_df.loc[num_saved] = [f"{record_rel_path}_{idx}.pkl",
@@ -191,9 +198,33 @@ def run(paths, output_dir = '', ref_path = ''):
                         num_saved += 1
                 except : 
                     num_deleted += 1
-                    print(ref, f"{'A' + record_rel_path[6:]}")
+                    #print(ref, f"{'A' + record_rel_path[6:]}")
                     break
-
+                    
+            elif cfg['dataset'] == 'PTB-XL' : 
+                
+                tmp_rel_path = record_rel_path.replace('\\','/')
+                record_rel_path = os.path.join('records500', record_rel_path).replace('\\','/')
+                
+                
+                try : 
+                    if len(ref[ref['filepath'] == f"{record_rel_path}"].iloc[0, 5].split(',')) >= 2 :
+                        continue
+                        
+                    index_df.loc[num_saved] = [f"{tmp_rel_path}_{idx}.pkl",
+                            f"{record_name}_{idx}.pkl",
+                            fs,
+                            source_name,
+                            cla[ref[ref['filepath'] == f"{record_rel_path}"].iloc[0, 5][2:-2]]]
+                        
+                    num_saved += 1
+                    #print(cla[ref[ref['filepath'] == f"{record_rel_path}"].iloc[0, 5][2:-2]])
+                    
+                except :
+                    num_deleted += 1
+                    print(record_rel_path)
+                    break
+                
             else :
                 index_df.loc[num_saved] = [f"{record_rel_path}_{idx}.pkl",
                         f"{record_name}_{idx}.pkl",
@@ -201,6 +232,7 @@ def run(paths, output_dir = '', ref_path = ''):
                         source_name,
                         ref[ref['filepath'] == f"{record_rel_path}"].iloc[0, 1]]
                 num_saved += 1
+
 
     print(f"Saved {num_saved} cropped signals, {num_deleted} signals deleted.")
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
@@ -230,7 +262,7 @@ def main() :
     cfg['dataset'] = args.dataset
 
     index_path = run(args.data_path, args.output_dir, args.ref_path)
-        
+    
     index = pd.read_csv(index_path)
 
     if args.weight :
