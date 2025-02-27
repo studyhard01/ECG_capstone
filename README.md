@@ -48,3 +48,27 @@ test_dataloader = get_dataloader(test_data, True, False, "eval")
 ```
 
 cfg에 각종 파라미터들을 저장할 수 있습니다. 이후 학습도 가능한 코드 작성시 파라미터를 조정하는데 사용될 것입니다. 
+
+
+
+# pretraining
+ㄷ
+st_mem_base.yaml index_dir, ecg_dir, output_dir 수정 후 실행
+
+```python
+output_dir: ---
+
+dataset:
+  filename_col: RELATIVE_FILE_PATH
+  fs_col: SAMPLE_RATE
+  lead: 12lead
+  fs: 250
+  index_dir: ---
+  ecg_dir: ---
+
+  train_csv: chapman_ningbo_index.csv
+
+!python main_pretrain.py --config_path './st_mem_base.yaml'
+
+```
+
