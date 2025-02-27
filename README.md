@@ -51,9 +51,9 @@ cfg에 각종 파라미터들을 저장할 수 있습니다. 이후 학습도 �
 
 
 
-# pretraining
-ㄷ
-st_mem_base.yaml index_dir, ecg_dir, output_dir 수정 후 실행
+# pretraining  
+
+st_mem_base.yaml index_dir, ecg_dir, output_dir 수정 후 실행  
 
 ```python
 output_dir: ---
